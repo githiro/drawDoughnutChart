@@ -1,14 +1,3 @@
-$(function(){
-  $("#doughnutChart").drawDoughnutChart([
-    { title: "Tokyo",         value : 100,  color: "#2C3E50" },
-    { title: "San Francisco", value:  80,   color: "#FC4349" },
-    { title: "New York",      value:  70,   color: "#6DBCDB" },
-    { title: "London",        value : 50,   color: "#F7E248" },
-    { title: "Sydney",        value : 40,   color: "#D7DADB" },
-    { title: "Berlin",        value : 20,   color: "#FFF" }
-  ]);
-});
-
 /*!
  * jquery.drawDoughnutChart.js
  * Version: 0.2(Beta)
