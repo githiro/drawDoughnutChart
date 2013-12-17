@@ -5,7 +5,7 @@
  *
  * Copyright 2013 hiro
  * https://github.com/githiro/drawDoughnutChart
- * Released under the MIT license
+ * Released under the MIT license.
  * 
  */
 ;(function($, undefined) {
@@ -101,7 +101,7 @@
       $svgBase[0].setAttribute("fill", settings.baseColor);
     }();
 
-    //Set up pie segments
+    //Set up pie segments wrapper
     var pathGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     var $pathGroup = $(pathGroup).appendTo($svg);
     $pathGroup[0].setAttribute("opacity",0);
@@ -136,7 +136,6 @@
         .on("mouseleave", pathMouseLeave)
         .on("mousemove", pathMouseMove);
     }
-
 
     //Animation start
     animationLoop(drawPieSegments);
@@ -182,11 +181,11 @@
           startX2 = centerX + cos(endRadius) * cutoutRadius,
           startY2 = centerY + sin(endRadius) * cutoutRadius;
         var cmd = [
-          'M', startX, startY,
-          'A', doughnutRadius, doughnutRadius, 0, largeArc, 1, endX, endY,
-          'L', startX2, startY2,
-          'A', cutoutRadius, cutoutRadius, 0, largeArc, 0, endX2, endY2,
-          'Z'
+          'M', startX, startY,//Move pointer
+          'A', doughnutRadius, doughnutRadius, 0, largeArc, 1, endX, endY,//Draw outer arc path
+          'L', startX2, startY2,//Draw line path(this line connects outer and innner arc paths)
+          'A', cutoutRadius, cutoutRadius, 0, largeArc, 0, endX2, endY2,//Draw inner arc path
+          'Z'//Cloth path
         ];
         $paths[i][0].setAttribute("d",cmd.join(' '));
         startRadius += segmentAngle;
