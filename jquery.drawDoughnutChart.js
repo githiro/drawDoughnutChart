@@ -1,6 +1,6 @@
 /*!
  * jquery.drawDoughnutChart.js
- * Version: 0.2(Beta)
+ * Version: 0.3(Beta)
  * Inspired by Chart.js(http://www.chartjs.org/)
  *
  * Copyright 2013 hiro
@@ -50,88 +50,91 @@
           var v = t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t;
           return (v>1) ? 1 : v;
         }
-      };
-    var requestAnimFrame = function(){
-      return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback) {
-          window.setTimeout(callback, 1000 / 60);
-        };
-    }();
+      },
+      requestAnimFrame = function(){
+        return window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+          };
+      }();
 
     settings.beforeDraw.call($this);
 
     var $svg = $('<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>').appendTo($this),
-      $paths = [],
-      easingFunction = animationOptions[settings.animationEasing],
-      doughnutRadius = Min([H/2,W/2]) - settings.edgeOffset,
-      cutoutRadius = doughnutRadius * (settings.percentageInnerCutout/100),
-      segmentTotal = 0;
+        $paths = [],
+        easingFunction = animationOptions[settings.animationEasing],
+        doughnutRadius = Min([H / 2,W / 2]) - settings.edgeOffset,
+        cutoutRadius = doughnutRadius * (settings.percentageInnerCutout / 100),
+        segmentTotal = 0;
 
     //Draw base doughnut
     var baseDoughnutRadius = doughnutRadius + settings.baseOffset,
-      baseCutoutRadius = cutoutRadius - settings.baseOffset;
+        baseCutoutRadius = cutoutRadius - settings.baseOffset;
     var drawBaseDoughnut = function(){
-      var svgBase = document.createElementNS('http://www.w3.org/2000/svg', 'path'),
-        $svgBase = $(svgBase).appendTo($svg);
-      //Calculate values for the path.
-      //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
-      var startRadius = -1.570,// -Math.PI/2
-        segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),
-        endRadius = 4.7131,// startRadius + segmentAngle
-        startX = centerX + cos(startRadius) * baseDoughnutRadius,
-        startY = centerY + sin(startRadius) * baseDoughnutRadius,
-        endX2 = centerX + cos(startRadius) * baseCutoutRadius,
-        endY2 = centerY + sin(startRadius) * baseCutoutRadius,
-        endX = centerX + cos(endRadius) * baseDoughnutRadius,
-        endY = centerY + sin(endRadius) * baseDoughnutRadius,
-        startX2 = centerX + cos(endRadius) * baseCutoutRadius,
-        startY2 = centerY + sin(endRadius) * baseCutoutRadius;
-      var cmd = [
-        'M', startX, startY,
-        'A', baseDoughnutRadius, baseDoughnutRadius, 0, 1, 1, endX, endY,
-        'L', startX2, startY2,
-        'A', baseCutoutRadius, baseCutoutRadius, 0, 1, 0, endX2, endY2,//reverse
-        'Z'
-      ];
-      $svgBase[0].setAttribute("d", cmd.join(' '));
-      $svgBase[0].setAttribute("fill", settings.baseColor);
+        //Calculate values for the path.
+        //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
+        var startRadius = -1.570,// -Math.PI/2
+            segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),
+            endRadius = 4.7131,// startRadius + segmentAngle
+            startX = centerX + cos(startRadius) * baseDoughnutRadius,
+            startY = centerY + sin(startRadius) * baseDoughnutRadius,
+            endX2 = centerX + cos(startRadius) * baseCutoutRadius,
+            endY2 = centerY + sin(startRadius) * baseCutoutRadius,
+            endX = centerX + cos(endRadius) * baseDoughnutRadius,
+            endY = centerY + sin(endRadius) * baseDoughnutRadius,
+            startX2 = centerX + cos(endRadius) * baseCutoutRadius,
+            startY2 = centerY + sin(endRadius) * baseCutoutRadius;
+        var cmd = [
+          'M', startX, startY,
+          'A', baseDoughnutRadius, baseDoughnutRadius, 0, 1, 1, endX, endY,
+          'L', startX2, startY2,
+          'A', baseCutoutRadius, baseCutoutRadius, 0, 1, 0, endX2, endY2,//reverse
+          'Z'
+        ];
+        $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+          .attr({
+            "d": cmd.join(' '),
+            "fill": settings.baseColor
+          })
+          .appendTo($svg);
     }();
 
     //Set up pie segments wrapper
-    var pathGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    var $pathGroup = $(pathGroup).appendTo($svg);
-    $pathGroup[0].setAttribute("opacity",0);
+    var $pathGroup = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
+    $pathGroup.attr({opacity: 0}).appendTo($svg);
 
     //Set up tooltip
     var $tip = $('<div class="' + settings.tipClass + '" />').appendTo('body').hide(),
-      tipW = $tip.width(),
-      tipH = $tip.height();
+        tipW = $tip.width(),
+        tipH = $tip.height();
 
     //Set up center text area
     var summarySize = (cutoutRadius - (doughnutRadius - cutoutRadius)) * 2,
-      $summary = $('<div class="' + settings.summaryClass + '" />').appendTo($this)
-                  .css({ 
-                    width: summarySize + "px",
-                    height: summarySize + "px",
-                    "margin-left": -(summarySize / 2) + "px",
-                    "margin-top": -(summarySize / 2) + "px"
-                  });
+        $summary = $('<div class="' + settings.summaryClass + '" />')
+                   .appendTo($this)
+                   .css({ 
+                     width: summarySize + "px",
+                     height: summarySize + "px",
+                     "margin-left": -(summarySize / 2) + "px",
+                     "margin-top": -(summarySize / 2) + "px"
+                   });
     var $summaryTitle = $('<p class="' + settings.summaryTitleClass + '">' + settings.summaryTitle + '</p>').appendTo($summary);
     var $summaryNumber = $('<p class="' + settings.summaryNumberClass + '"></p>').appendTo($summary).css({opacity: 0});
 
     for (var i = 0, len = data.length; i < len; i++){
       segmentTotal += data[i].value;
-      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute("stroke-width", settings.segmentStrokeWidth);
-      p.setAttribute("stroke", settings.segmentStrokeColor);
-      p.setAttribute("fill", data[i].color);
-      p.setAttribute("data-order", i);
-      $paths[i] = $(p).appendTo($pathGroup);
-      $paths[i]
+      $paths[i] = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+        .attr({
+          "stroke-width": settings.segmentStrokeWidth,
+          "stroke": settings.segmentStrokeColor,
+          "fill": data[i].color,
+          "data-order": i
+        })
+        .appendTo($pathGroup)
         .on("mouseenter", pathMouseEnter)
         .on("mouseleave", pathMouseLeave)
         .on("mousemove", pathMouseMove);
@@ -143,7 +146,7 @@
     function pathMouseEnter(e){
       var order = $(this).data().order;
       $tip.text(data[order].title + ": " + data[order].value)
-        .fadeIn(200);
+          .fadeIn(200);
       settings.onPathEnter.apply($(this),[e,data]);
     }
     function pathMouseLeave(e){
@@ -157,15 +160,13 @@
       });
     }
     function drawPieSegments (animationDecimal){
-      var startRadius = -Math.PI/2,//-90 degree
-        rotateAnimation = 1;
-      if (settings.animation && settings.animateRotate) {
-        rotateAnimation = animationDecimal;//count up between0~1
-      }
+      var startRadius = -PI / 2,//-90 degree
+          rotateAnimation = 1;
+      if (settings.animation && settings.animateRotate) rotateAnimation = animationDecimal;//count up between0~1
 
       drawDoughnutText(animationDecimal,segmentTotal);
 
-      $pathGroup[0].setAttribute("opacity",animationDecimal);
+      $pathGroup[0].setAttribute("opacity", animationDecimal);
 
       //draw each path
       for (var i = 0, len = data.length; i < len; i++){
@@ -187,7 +188,7 @@
           'A', cutoutRadius, cutoutRadius, 0, largeArc, 0, endX2, endY2,//Draw inner arc path
           'Z'//Cloth path
         ];
-        $paths[i][0].setAttribute("d",cmd.join(' '));
+        $paths[i].attr("d", cmd.join(' '));
         startRadius += segmentAngle;
       }
     }
@@ -198,12 +199,12 @@
         .text((segmentTotal * animationDecimal).toFixed(1));
     }
     function animateFrame(cnt, drawData){
-      var easeAdjustedAnimationPercent =(settings.animation)? CapValue(easingFunction(cnt),null,0) : 1;
+      var easeAdjustedAnimationPercent =(settings.animation)? CapValue(easingFunction(cnt), null, 0) : 1;
       drawData(easeAdjustedAnimationPercent);
     }
     function animationLoop(drawData){
-      var animFrameAmount = (settings.animation)? 1/CapValue(settings.animationSteps,Number.MAX_VALUE,1) : 1,
-        cnt =(settings.animation)? 0 : 1;
+      var animFrameAmount = (settings.animation)? 1 / CapValue(settings.animationSteps, Number.MAX_VALUE, 1) : 1,
+          cnt =(settings.animation)? 0 : 1;
       requestAnimFrame(function(){
           cnt += animFrameAmount;
           animateFrame(cnt, drawData);
