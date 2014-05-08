@@ -73,4 +73,4 @@ body {
   margin-top: -15%;
   font-size: 55px;
 }
-path:hover { opacity: .65; }
+g path:hover { opacity: .65; }

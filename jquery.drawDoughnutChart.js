@@ -1,9 +1,9 @@
 /*!
  * jquery.drawDoughnutChart.js
- * Version: 0.3(Beta)
+ * Version: 0.4(Beta)
  * Inspired by Chart.js(http://www.chartjs.org/)
  *
- * Copyright 2013 hiro
+ * Copyright 2014 hiro
  * https://github.com/githiro/drawDoughnutChart
  * Released under the MIT license.
  * 
@@ -73,35 +73,14 @@
 
     //Draw base doughnut
     var baseDoughnutRadius = doughnutRadius + settings.baseOffset,
-        baseCutoutRadius = cutoutRadius - settings.baseOffset;
-    var drawBaseDoughnut = function() {
-        //Calculate values for the path.
-        //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
-        var startRadius = -1.570,// -Math.PI/2
-            segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),
-            endRadius = 4.7131,// startRadius + segmentAngle
-            startX = centerX + cos(startRadius) * baseDoughnutRadius,
-            startY = centerY + sin(startRadius) * baseDoughnutRadius,
-            endX2 = centerX + cos(startRadius) * baseCutoutRadius,
-            endY2 = centerY + sin(startRadius) * baseCutoutRadius,
-            endX = centerX + cos(endRadius) * baseDoughnutRadius,
-            endY = centerY + sin(endRadius) * baseDoughnutRadius,
-            startX2 = centerX + cos(endRadius) * baseCutoutRadius,
-            startY2 = centerY + sin(endRadius) * baseCutoutRadius;
-        var cmd = [
-          'M', startX, startY,
-          'A', baseDoughnutRadius, baseDoughnutRadius, 0, 1, 1, endX, endY,
-          'L', startX2, startY2,
-          'A', baseCutoutRadius, baseCutoutRadius, 0, 1, 0, endX2, endY2,//reverse
-          'Z'
-        ];
-        $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
-          .attr({
-            "d": cmd.join(' '),
-            "fill": settings.baseColor
-          })
-          .appendTo($svg);
-    }();
+        baseCutoutRadius = cutoutRadius - settings.baseOffset,
+        baseDoughnutCmd = getHollowCircleCmd(baseDoughnutRadius, baseCutoutRadius);
+    $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+      .attr({
+        "d": baseDoughnutCmd.join(' '),
+        "fill": settings.baseColor
+      })
+      .appendTo($svg);
 
     //Set up pie segments wrapper
     var $pathGroup = $(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
@@ -143,6 +122,31 @@
     //Animation start
     animationLoop(drawPieSegments);
 
+    //Functions
+    function getHollowCircleCmd(doughnutRadius, cutoutRadius) {
+        //Calculate values for the path.
+        //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
+        var startRadius = -1.570,// -Math.PI/2
+            segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),
+            endRadius = 4.7131,// startRadius + segmentAngle
+            startX = centerX + cos(startRadius) * doughnutRadius,
+            startY = centerY + sin(startRadius) * doughnutRadius,
+            endX2 = centerX + cos(startRadius) * cutoutRadius,
+            endY2 = centerY + sin(startRadius) * cutoutRadius,
+            endX = centerX + cos(endRadius) * doughnutRadius,
+            endY = centerY + sin(endRadius) * doughnutRadius,
+            startX2 = centerX + cos(endRadius) * cutoutRadius,
+            startY2 = centerY + sin(endRadius) * cutoutRadius;
+        var cmd = [
+          'M', startX, startY,
+          'A', doughnutRadius, doughnutRadius, 0, 1, 1, endX, endY,//Draw outer circle
+          'Z',//Close path
+          'M', startX2, startY2,//Move pointer
+          'A', cutoutRadius, cutoutRadius, 0, 1, 0, endX2, endY2,//Draw inner circle
+          'Z'
+        ];
+        return cmd;
+    };
     function pathMouseEnter(e) {
       var order = $(this).data().order;
       $tip.text(data[order].title + ": " + data[order].value)
@@ -168,7 +172,12 @@
 
       $pathGroup.attr("opacity", animationDecimal);
 
-      //draw each path
+      //If data have only one value, we draw hollow circle(#1).
+      if (data.length === 1 && (4.7122 < (rotateAnimation * ((data[0].value / segmentTotal) * (PI * 2)) + startRadius))) {
+        var hollowCircleCmd = getHollowCircleCmd(doughnutRadius, cutoutRadius);
+        $paths[0].attr("d", hollowCircleCmd.join(' '));
+        return;
+      }
       for (var i = 0, len = data.length; i < len; i++) {
         var segmentAngle = rotateAnimation * ((data[i].value / segmentTotal) * (PI * 2)),
             endRadius = startRadius + segmentAngle,
@@ -192,7 +201,6 @@
         startRadius += segmentAngle;
       }
     }
-
     function drawDoughnutText(animationDecimal, segmentTotal) {
       $summaryNumber
         .css({opacity: animationDecimal})
