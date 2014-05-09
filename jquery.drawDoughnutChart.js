@@ -73,11 +73,10 @@
 
     //Draw base doughnut
     var baseDoughnutRadius = doughnutRadius + settings.baseOffset,
-        baseCutoutRadius = cutoutRadius - settings.baseOffset,
-        baseDoughnutCmd = getHollowCircleCmd(baseDoughnutRadius, baseCutoutRadius);
+        baseCutoutRadius = cutoutRadius - settings.baseOffset;
     $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
       .attr({
-        "d": baseDoughnutCmd.join(' '),
+        "d": getHollowCirclePath(baseDoughnutRadius, baseCutoutRadius),
         "fill": settings.baseColor
       })
       .appendTo($svg);
@@ -123,7 +122,7 @@
     animationLoop(drawPieSegments);
 
     //Functions
-    function getHollowCircleCmd(doughnutRadius, cutoutRadius) {
+    function getHollowCirclePath(doughnutRadius, cutoutRadius) {
         //Calculate values for the path.
         //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
         var startRadius = -1.570,// -Math.PI/2
@@ -145,6 +144,7 @@
           'A', cutoutRadius, cutoutRadius, 0, 1, 0, endX2, endY2,//Draw inner circle
           'Z'
         ];
+        cmd = cmd.join(' ');
         return cmd;
     };
     function pathMouseEnter(e) {
@@ -174,8 +174,7 @@
 
       //If data have only one value, we draw hollow circle(#1).
       if (data.length === 1 && (4.7122 < (rotateAnimation * ((data[0].value / segmentTotal) * (PI * 2)) + startRadius))) {
-        var hollowCircleCmd = getHollowCircleCmd(doughnutRadius, cutoutRadius);
-        $paths[0].attr("d", hollowCircleCmd.join(' '));
+        $paths[0].attr("d", getHollowCirclePath(doughnutRadius, cutoutRadius));
         return;
       }
       for (var i = 0, len = data.length; i < len; i++) {
