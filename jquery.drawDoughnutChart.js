@@ -32,6 +32,7 @@
         animateRotate : true,
         tipOffsetX: -8,
         tipOffsetY: -45,
+        showTip: true,
         tipClass: "doughnutTip",
         summaryClass: "doughnutSummary",
         summaryTitle: "TOTAL:",
@@ -86,9 +87,11 @@
     $pathGroup.attr({opacity: 0}).appendTo($svg);
 
     //Set up tooltip
-    var $tip = $('<div class="' + settings.tipClass + '" />').appendTo('body').hide(),
-        tipW = $tip.width(),
-        tipH = $tip.height();
+    if (settings.showTip) {
+      var $tip = $('<div class="' + settings.tipClass + '" />').appendTo('body').hide(),
+          tipW = $tip.width(),
+          tipH = $tip.height();
+    }
 
     //Set up center text area
     var summarySize = (cutoutRadius - (doughnutRadius - cutoutRadius)) * 2,
@@ -149,19 +152,23 @@
     };
     function pathMouseEnter(e) {
       var order = $(this).data().order;
-      $tip.text(data[order].title + ": " + data[order].value)
-          .fadeIn(200);
+      if (settings.showTip) {
+        $tip.text(data[order].title + ": " + data[order].value)
+            .fadeIn(200);
+      }
       settings.onPathEnter.apply($(this),[e,data]);
     }
     function pathMouseLeave(e) {
-      $tip.hide();
+      if (settings.showTip) $tip.hide();
       settings.onPathLeave.apply($(this),[e,data]);
     }
     function pathMouseMove(e) {
-      $tip.css({
-        top: e.pageY + settings.tipOffsetY,
-        left: e.pageX - $tip.width() / 2 + settings.tipOffsetX
-      });
+      if (settings.showTip) {
+        $tip.css({
+          top: e.pageY + settings.tipOffsetY,
+          left: e.pageX - $tip.width() / 2 + settings.tipOffsetX
+        });
+      }
     }
     function drawPieSegments (animationDecimal) {
       var startRadius = -PI / 2,//-90 degree
