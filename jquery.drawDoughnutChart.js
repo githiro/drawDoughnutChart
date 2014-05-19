@@ -34,6 +34,7 @@
         tipOffsetY: -45,
         showTip: true,
         showLabel: false,
+        ratioFont: 1.5,
         shortInt: false,
         tipClass: "doughnutTip",
         summaryClass: "doughnutSummary",
@@ -276,12 +277,25 @@
 	function getScaleFontSize(block, newText) {
 		block.css('font-size', '');
         newText = newText.toString().replace(/(<([^>]+)>)/ig,"");
+		var newFontSize = block.width() / newText.length * settings.ratioFont;
+		// Not very good : http://stephensite.net/WordPressSS/2008/02/19/how-to-calculate-the-character-width-accross-fonts-and-points/
+		// But best quick way the 1.5 number is to affinate in function of the police
+		var maxCharForDefaultFont = block.width() - newText.length * block.css('font-size').replace(/px/, '') / settings.ratioFont;
+		if(maxCharForDefaultFont<0)
+			return newFontSize+'px';
+		else
+			return '';
+	}
+	/**
+	function getScaleFontSize(block, newText) {
+		block.css('font-size', '');
+        newText = newText.toString().replace(/(<([^>]+)>)/ig,"");
 		var newFontSize = block.width() / newText.length;
 		if(newFontSize<block.css('font-size').replace(/px/, ''))
 			return newFontSize+'px';
 		else
 			return '';
-	}
+	}*/
     return $this;
   };
 })(jQuery);
