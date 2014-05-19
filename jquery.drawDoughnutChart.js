@@ -6,7 +6,7 @@
  * Copyright 2014 hiro
  * https://github.com/githiro/drawDoughnutChart
  * Released under the MIT license.
- * 
+ *
  */
 ;(function($, undefined) {
   $.fn.drawDoughnutChart = function(data, options) {
@@ -97,7 +97,7 @@
     var summarySize = (cutoutRadius - (doughnutRadius - cutoutRadius)) * 2,
         $summary = $('<div class="' + settings.summaryClass + '" />')
                    .appendTo($this)
-                   .css({ 
+                   .css({
                      width: summarySize + "px",
                      height: summarySize + "px",
                      "margin-left": -(summarySize / 2) + "px",
@@ -118,7 +118,8 @@
         .appendTo($pathGroup)
         .on("mouseenter", pathMouseEnter)
         .on("mouseleave", pathMouseLeave)
-        .on("mousemove", pathMouseMove);
+        .on("mousemove", pathMouseMove)
+		.on("click", pathClick);
     }
 
     //Animation start
@@ -170,6 +171,11 @@
         });
       }
     }
+	function pathClick(e){
+	var order = $(this).data().order;
+	  if (typeof data[order].action != "undefined")
+		  data[order].action();
+	}
     function drawPieSegments (animationDecimal) {
       var startRadius = -PI / 2,//-90 degree
           rotateAnimation = 1;
