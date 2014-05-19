@@ -33,6 +33,8 @@
         tipOffsetX: -8,
         tipOffsetY: -45,
         showTip: true,
+        showLabel: false,
+        shortInt: false,
         tipClass: "doughnutTip",
         summaryClass: "doughnutSummary",
         summaryTitle: "TOTAL:",
@@ -104,6 +106,7 @@
                      "margin-top": -(summarySize / 2) + "px"
                    });
     var $summaryTitle = $('<p class="' + settings.summaryTitleClass + '">' + settings.summaryTitle + '</p>').appendTo($summary);
+    $summaryTitle.css('font-size', getScaleFontSize( $summaryTitle, settings.summaryTitle )); // In most of case useless
     var $summaryNumber = $('<p class="' + settings.summaryNumberClass + '"></p>').appendTo($summary).css({opacity: 0});
 
     for (var i = 0, len = data.length; i < len; i++) {
@@ -157,10 +160,20 @@
         $tip.text(data[order].title + ": " + data[order].value)
             .fadeIn(200);
       }
+      if(settings.showLabel) {
+		  $summaryTitle.text(data[order].title).css('font-size', getScaleFontSize( $summaryTitle, data[order].title));
+          var tmpNumber = settings.shortInt ? shortKInt(data[order].value) : data[order].value;
+		  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
+	  }
       settings.onPathEnter.apply($(this),[e,data]);
     }
     function pathMouseLeave(e) {
       if (settings.showTip) $tip.hide();
+      if(settings.showLabel) {
+		  $summaryTitle.text(settings.summaryTitle).css('font-size', getScaleFontSize( $summaryTitle, settings.summaryTitle));
+          var tmpNumber = settings.shortInt ? shortKInt(segmentTotal) : segmentTotal;
+		  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
+	  }
       settings.onPathLeave.apply($(this),[e,data]);
     }
     function pathMouseMove(e) {
@@ -217,6 +230,8 @@
       $summaryNumber
         .css({opacity: animationDecimal})
         .text((segmentTotal * animationDecimal).toFixed(1));
+	  var tmpNumber = settings.shortInt ? shortKInt(segmentTotal) : segmentTotal;
+	  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
     }
     function animateFrame(cnt, drawData) {
       var easeAdjustedAnimationPercent =(settings.animation)? CapValue(easingFunction(cnt), null, 0) : 1;
@@ -249,6 +264,24 @@
       if (isNumber(minValue) && valueToCap < minValue) return minValue;
       return valueToCap;
     }
+    function shortKInt (int) {
+		int = int.toString();
+		var strlen = int.length;
+		if(strlen<5)
+			return int;
+		if(strlen<8)
+			return '<span title="' +  int +  '">' + int.substring(0, strlen-3) + 'K</span>';
+		return '<span title="' + int  + '">' + int.substring( 0, strlen-6) + 'M</span>';
+	}
+	function getScaleFontSize(block, newText) {
+		block.css('font-size', '');
+        newText = newText.toString().replace(/(<([^>]+)>)/ig,"");
+		var newFontSize = block.width() / newText.length;
+		if(newFontSize<block.css('font-size').replace(/px/, ''))
+			return newFontSize+'px';
+		else
+			return '';
+	}
     return $this;
   };
 })(jQuery);
