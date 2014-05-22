@@ -6,7 +6,7 @@
  * Copyright 2014 hiro
  * https://github.com/githiro/drawDoughnutChart
  * Released under the MIT license.
- * 
+ *
  */
 ;(function($, undefined) {
   $.fn.drawDoughnutChart = function(data, options) {
@@ -33,6 +33,9 @@
         tipOffsetX: -8,
         tipOffsetY: -45,
         showTip: true,
+        showLabel: false,
+        ratioFont: 1.5,
+        shortInt: false,
         tipClass: "doughnutTip",
         summaryClass: "doughnutSummary",
         summaryTitle: "TOTAL:",
@@ -97,13 +100,14 @@
     var summarySize = (cutoutRadius - (doughnutRadius - cutoutRadius)) * 2,
         $summary = $('<div class="' + settings.summaryClass + '" />')
                    .appendTo($this)
-                   .css({ 
+                   .css({
                      width: summarySize + "px",
                      height: summarySize + "px",
                      "margin-left": -(summarySize / 2) + "px",
                      "margin-top": -(summarySize / 2) + "px"
                    });
     var $summaryTitle = $('<p class="' + settings.summaryTitleClass + '">' + settings.summaryTitle + '</p>').appendTo($summary);
+    $summaryTitle.css('font-size', getScaleFontSize( $summaryTitle, settings.summaryTitle )); // In most of case useless
     var $summaryNumber = $('<p class="' + settings.summaryNumberClass + '"></p>').appendTo($summary).css({opacity: 0});
 
     for (var i = 0, len = data.length; i < len; i++) {
@@ -118,7 +122,8 @@
         .appendTo($pathGroup)
         .on("mouseenter", pathMouseEnter)
         .on("mouseleave", pathMouseLeave)
-        .on("mousemove", pathMouseMove);
+        .on("mousemove", pathMouseMove)
+		.on("click", pathClick);
     }
 
     //Animation start
@@ -156,10 +161,20 @@
         $tip.text(data[order].title + ": " + data[order].value)
             .fadeIn(200);
       }
+      if(settings.showLabel) {
+		  $summaryTitle.text(data[order].title).css('font-size', getScaleFontSize( $summaryTitle, data[order].title));
+          var tmpNumber = settings.shortInt ? shortKInt(data[order].value) : data[order].value;
+		  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
+	  }
       settings.onPathEnter.apply($(this),[e,data]);
     }
     function pathMouseLeave(e) {
       if (settings.showTip) $tip.hide();
+      if(settings.showLabel) {
+		  $summaryTitle.text(settings.summaryTitle).css('font-size', getScaleFontSize( $summaryTitle, settings.summaryTitle));
+          var tmpNumber = settings.shortInt ? shortKInt(segmentTotal) : segmentTotal;
+		  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
+	  }
       settings.onPathLeave.apply($(this),[e,data]);
     }
     function pathMouseMove(e) {
@@ -170,6 +185,11 @@
         });
       }
     }
+	function pathClick(e){
+	var order = $(this).data().order;
+	  if (typeof data[order].action != "undefined")
+		  data[order].action();
+	}
     function drawPieSegments (animationDecimal) {
       var startRadius = -PI / 2,//-90 degree
           rotateAnimation = 1;
@@ -211,6 +231,8 @@
       $summaryNumber
         .css({opacity: animationDecimal})
         .text((segmentTotal * animationDecimal).toFixed(1));
+	  var tmpNumber = settings.shortInt ? shortKInt(segmentTotal) : segmentTotal;
+	  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
     }
     function animateFrame(cnt, drawData) {
       var easeAdjustedAnimationPercent =(settings.animation)? CapValue(easingFunction(cnt), null, 0) : 1;
@@ -243,6 +265,37 @@
       if (isNumber(minValue) && valueToCap < minValue) return minValue;
       return valueToCap;
     }
+    function shortKInt (int) {
+		int = int.toString();
+		var strlen = int.length;
+		if(strlen<5)
+			return int;
+		if(strlen<8)
+			return '<span title="' +  int +  '">' + int.substring(0, strlen-3) + 'K</span>';
+		return '<span title="' + int  + '">' + int.substring( 0, strlen-6) + 'M</span>';
+	}
+	function getScaleFontSize(block, newText) {
+		block.css('font-size', '');
+        newText = newText.toString().replace(/(<([^>]+)>)/ig,"");
+		var newFontSize = block.width() / newText.length * settings.ratioFont;
+		// Not very good : http://stephensite.net/WordPressSS/2008/02/19/how-to-calculate-the-character-width-accross-fonts-and-points/
+		// But best quick way the 1.5 number is to affinate in function of the police
+		var maxCharForDefaultFont = block.width() - newText.length * block.css('font-size').replace(/px/, '') / settings.ratioFont;
+		if(maxCharForDefaultFont<0)
+			return newFontSize+'px';
+		else
+			return '';
+	}
+	/**
+	function getScaleFontSize(block, newText) {
+		block.css('font-size', '');
+        newText = newText.toString().replace(/(<([^>]+)>)/ig,"");
+		var newFontSize = block.width() / newText.length;
+		if(newFontSize<block.css('font-size').replace(/px/, ''))
+			return newFontSize+'px';
+		else
+			return '';
+	}*/
     return $this;
   };
 })(jQuery);
