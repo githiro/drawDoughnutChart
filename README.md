@@ -1,4 +1,4 @@
-drawDoughnutChart
+jquery.drawDoughnutChart.js
 =================
 
 A SVG doughnut chart with animation and tooltip.
