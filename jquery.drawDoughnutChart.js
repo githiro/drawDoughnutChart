@@ -41,6 +41,7 @@
         summaryTitle: "TOTAL:",
         summaryTitleClass: "doughnutSummaryTitle",
         summaryNumberClass: "doughnutSummaryNumber",
+        summaryRound: false,
         beforeDraw: function() {  },
         afterDrawed : function() {  },
         onPathEnter : function(e,data) {  },
@@ -231,6 +232,9 @@
       $summaryNumber
         .css({opacity: animationDecimal})
         .text((segmentTotal * animationDecimal).toFixed(1));
+	  if ( settings.summaryRound ) {
+	  	segmentTotal = Math.round(segmentTotal);
+	  }
 	  var tmpNumber = settings.shortInt ? shortKInt(segmentTotal) : segmentTotal;
 	  $summaryNumber.html(tmpNumber).css('font-size', getScaleFontSize( $summaryNumber, tmpNumber));
     }
