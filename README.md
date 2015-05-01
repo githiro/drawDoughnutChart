@@ -44,11 +44,11 @@ $(function(){
 </html>
 ```
 RESULT:
-A's title: "A."
-B's title: "B. B's value: 80mm."
-C's title: "C.A's value: 100mm, B's value: 80mm, C's value: 70mm"
-......
-F's title: "F. F's value: 20mm"
+- A's title: "A."
+- B's title: "B. B's value: 80mm."
+- C's title: "C.A's value: 100mm, B's value: 80mm, C's value: 70mm"
+- ......
+- F's title: "F. F's value: 20mm"
 
 ## API reference
 
