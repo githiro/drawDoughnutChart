@@ -8,8 +8,8 @@
  * Released under the MIT license.
  *
  */
-drawDoughnutChart = function(data, options) {
-  var $this = document.getElementById('doughnutChart'),
+drawDoughnutChart = function(data, options, containerId) {
+  var $this = document.getElementById(containerId),
     W = parseInt($this.clientWidth),
     H = parseInt($this.clientHeight),
     centerX = W / 2,
@@ -324,28 +324,3 @@ drawDoughnutChart = function(data, options) {
   }
   return $this;
 };
-drawDoughnutChart([{
-  title: "Tokyo",
-  value: 100,
-  color: "#2C3E50"
-}, {
-  title: "San Francisco",
-  value: 80,
-  color: "#FC4349"
-}, {
-  title: "New York",
-  value: 70,
-  color: "#6DBCDB"
-}, {
-  title: "London",
-  value: 50,
-  color: "#F7E248"
-}, {
-  title: "Sydney",
-  value: 40,
-  color: "#D7DADB"
-}, {
-  title: "Berlin",
-  value: 20,
-  color: "#FFF"
-}]);
