@@ -12,8 +12,8 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   if (height === undefined)
     height = width;
   var $this = document.createElement('div');
-  $this.width = width + 'px';
-  $this.height = (height||width) + 'px';
+  $this.style.width = width + 'px';
+  $this.style.height = (height||width) + 'px';
   $this.className = 'chart';
   parentElement.appendChild($this);
 
@@ -36,7 +36,7 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
       animationSteps: 90,
       animationEasing: "easeInOutExpo",
       animateRotate: true,
-      tipOffsetX: -8,
+      tipOffsetX: 0,
       tipOffsetY: -45,
       showTip: true,
       showLabel: false,
@@ -119,8 +119,8 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   $summary.setAttribute('class', settings.summaryClass);
   $summary.style.width = summarySize + 'px';
   $summary.style.height = summarySize + 'px';
-  $summary.style.marginLeft = -(summarySize / 2) + 'px';
-  $summary.style.marginTop = -(summarySize / 2) + 'px';
+  $summary.style.marginLeft = (summarySize / 2) + settings.edgeOffset + 'px';
+  $summary.style.marginTop = -(summarySize / 2) - (height / 2) + settings.edgeOffset + 'px';
   $this.appendChild($summary);
 
   var $summaryTitle = document.createElement('p');
@@ -181,13 +181,11 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
 
   function pathMouseEnter(e) {
     var order = parseInt(this.attributes['data-order'].value);
-    console.log('mouse entered', $tip);
     if (settings.showTip) {
       $tip.textContent = data[order].title + ": " + data[order].value;
       //$tip.textContent.className = 'show';
       $tip.style.opacity = 1;
     }
-    console.log($tip);
     if (settings.showLabel) {
       $summaryTitle.textContent = data[order].title;
       $summaryTitle.style.fontSize = getScaleFontSize($summaryTitle, data[order].title);
@@ -318,7 +316,7 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   }
 
   function getScaleFontSize(block, newText) {
-    block.style.fontSize = '';
+    block.style.fontSize = '0px';
     newText = newText.toString().replace(/(<([^>]+)>)/ig, "");
     var newFontSize = parseInt(block.clientWidth) / newText.length * settings.ratioFont;
     // Not very good : http://stephensite.net/WordPressSS/2008/02/19/how-to-calculate-the-character-width-accross-fonts-and-points/
