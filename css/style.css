@@ -1,8 +1,8 @@
 @import url(//fonts.googleapis.com/css?family=Oswald:400);
 .chart {
   position: absolute;
-  width: 450px;
-  height: 450px;
+  width: auto;
+  height: auto;
   top: 50%;
   left: 50%;
   margin: -225px 0 0 -225px;

@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <title>jquery.drawDoughnutChart.js</title>
-<link rel="stylesheet" href="style.css">
-<script src="../jquery.drawDoughnutChart.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/drawDoughnutChart.js"></script>
 </head>
 <body>
 
-	<div id="doughnutChart" class="chart"></div>
+	<div id="doughnutChart"></div>
 	<script defer>
 drawDoughnutChart([{
   title: "Tokyo",
@@ -34,7 +34,7 @@ drawDoughnutChart([{
   title: "Berlin",
   value: 20,
   color: "#FFF"
-}]);
+}], {}, document.getElementsByTagName('body')[0], 250);
 </script>
 </body>
 </html>

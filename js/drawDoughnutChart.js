@@ -8,10 +8,17 @@
  * Released under the MIT license.
  *
  */
-drawDoughnutChart = function(data, options, containerId) {
-  var $this = document.getElementById(containerId),
-    W = parseInt($this.clientWidth),
-    H = parseInt($this.clientHeight),
+drawDoughnutChart = function(data, options, parentElement, width, height) {
+  if (height === undefined)
+    height = width;
+  var $this = document.createElement('div');
+  $this.width = width + 'px';
+  $this.height = (height||width) + 'px';
+  $this.className = 'chart';
+  parentElement.appendChild($this);
+
+  var W = width,
+    H = height,
     centerX = W / 2,
     centerY = H / 2,
     cos = Math.cos,
