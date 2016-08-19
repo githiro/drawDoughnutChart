@@ -39,6 +39,7 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
       tipOffsetX: 0,
       tipOffsetY: -45,
       showTip: true,
+      showLongTip: false,
       showLabel: false,
       ratioFont: 1.5,
       shortInt: false,
@@ -102,6 +103,17 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   $pathGroup.setAttribute('opacity', 0);
   $svg.appendChild($pathGroup);
 
+  //Set up tooltip with arbitrary string
+  if (settings.showLongTip) {
+    settings.showTip = false;
+    var $tip = document.createElement('div');
+    $tip.setAttribute('class', settings.tipClass);
+    $tip.style.opacity = 0;
+    document.getElementsByTagName('body')[0].appendChild($tip);
+
+    var tipW = parseInt($tip.clientWidth),
+      tipH = parseInt($tip.clientHeight);
+  }
   //Set up tooltip
   if (settings.showTip) {
     var $tip = document.createElement('div');
@@ -181,6 +193,11 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
 
   function pathMouseEnter(e) {
     var order = parseInt(this.attributes['data-order'].value);
+    if (settings.showLongTip) {
+      $tip.textContent = data[order].tip;
+      //$tip.textContent.className = 'show';
+      $tip.style.opacity = 1;
+    }
     if (settings.showTip) {
       $tip.textContent = data[order].title + ": " + data[order].value;
       //$tip.textContent.className = 'show';
@@ -197,7 +214,7 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   }
 
   function pathMouseLeave(e) {
-    if (settings.showTip) $tip.style.opacity = 0;
+    if (settings.showTip || settings.showLongTip) $tip.style.opacity = 0;
     if (settings.showLabel) {
       $summaryTitle.textContent = settings.summaryTitle;
       $summaryTitle.style.fontSize = getScaleFontSize($summaryTitle, settings.summaryTitle);
@@ -209,7 +226,7 @@ drawDoughnutChart = function(data, options, parentElement, width, height) {
   }
 
   function pathMouseMove(e) {
-    if (settings.showTip) {
+    if (settings.showTip || settings.showLongTip) {
       $tip.style.top = e.pageY + settings.tipOffsetY + 'px';
       $tip.style.left = e.pageX - parseInt($tip.clientWidth) / 2 + settings.tipOffsetX + 'px';
     }
