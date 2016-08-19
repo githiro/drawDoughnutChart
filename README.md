@@ -1,9 +1,12 @@
-jquery.drawDoughnutChart.js
+drawDoughnutChart
 =================
 
 A SVG doughnut chart with animation and tooltip.
 Inspired by Chart.js(http://www.chartjs.org/).
 
-[Demo on my codepen](http://codepen.io/githiro/details/ICfFE)
+This is a rewritten version without any dependency.
+
+
+Credits go to [githiro](https://github.com/githiro/)
 
 Licensed under the MIT License.

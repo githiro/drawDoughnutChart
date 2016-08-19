@@ -1,19 +1,9 @@
 @import url(//fonts.googleapis.com/css?family=Oswald:400);
-* {
-  margin: 0;
-  padding: 0;
-}
-body {
-  background: #222428;
-  font-family: "Oswald", "Helvetica Newe", Helvetica, sans-serif;
-}
 .chart {
-  position: absolute;
-  width: 450px;
-  height: 450px;
-  top: 50%;
-  left: 50%;
-  margin: -225px 0 0 -225px;
+  width: auto;
+  height: auto;
+  font-family: "Oswald", "Helvetica Newe", Helvetica, sans-serif;
+  font-size: 0.9em;
 }
 .doughnutTip {
   position: absolute;
@@ -50,27 +40,20 @@ body {
   line-height: 0;
 }
 .doughnutSummary {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   color: #d5d5d5;
   text-align: center;
   text-shadow: 0 -1px 0 #111;
   cursor: default;
 }
 .doughnutSummaryTitle {
-  position: absolute;
-  top: 50%;
   width: 100%;
-  margin-top: -27%;
+  margin: 0px;
   font-size: 22px;
   letter-spacing: .06em;
 }
 .doughnutSummaryNumber {
-  position: absolute;
-  top: 50%;
   width: 100%;
-  margin-top: -15%;
   font-size: 55px;
+  margin: 5px 0px 0px;
 }
 g path:hover { opacity: .65; }

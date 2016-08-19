@@ -1,0 +1,17 @@
+{
+  "name": "drawDoughnutChart",
+  "description": "A SVG doughnut chart with animation and tooltip.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/amfg/drawDoughnutChart",
+  "authors": [{
+    "name": "Adam Kecer",
+    "homepage": "https://github.com/amfg"
+  },{
+    "name": "Githiro",
+    "homepage": "https://github.com/githiro"
+  }],
+  "main": ["js/drawDoughnutChart.js", "css/style.css"],
+  "dependencies": {
+  }
+}
