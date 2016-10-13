@@ -23,6 +23,7 @@
         segmentStrokeColor : "#0C1013",
         segmentStrokeWidth : 1,
         baseColor: "rgba(0,0,0,0.5)",
+        holeColor: "rgba(0,0,0,0)",
         baseOffset: 4,
         edgeOffset : 10,//offset from edge of $this
         percentageInnerCutout : 75,
@@ -75,9 +76,19 @@
         cutoutRadius = doughnutRadius * (settings.percentageInnerCutout / 100),
         segmentTotal = 0;
 
-    //Draw base doughnut
+
     var baseDoughnutRadius = doughnutRadius + settings.baseOffset,
         baseCutoutRadius = cutoutRadius - settings.baseOffset;
+
+    //Draw hole background
+    $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+      .attr({
+        "d": getHollowCirclePath(cutoutRadius + 1, 0), // +1 to add a little 'underlap' to avoid patchy seam
+        "fill": settings.holeColor
+      })
+      .appendTo($svg);
+
+    //Draw base doughnut
     $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
       .attr({
         "d": getHollowCirclePath(baseDoughnutRadius, baseCutoutRadius),
