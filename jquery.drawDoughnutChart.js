@@ -200,6 +200,7 @@
 		  data[order].action();
 	}
     function drawPieSegments (animationDecimal) {
+
       var startRadius = -PI / 2,//-90 degree
           rotateAnimation = 1;
       if (settings.animation && settings.animateRotate) rotateAnimation = animationDecimal;//count up between0~1
@@ -225,6 +226,13 @@
             endY = centerY + sin(endRadius) * doughnutRadius,
             startX2 = centerX + cos(endRadius) * cutoutRadius,
             startY2 = centerY + sin(endRadius) * cutoutRadius;
+
+        startRadius += segmentAngle;
+
+        if (data[i].value <= 0) {
+          return;
+        }
+
         var cmd = [
           'M', startX, startY,//Move pointer
           'A', doughnutRadius, doughnutRadius, 0, largeArc, 1, endX, endY,//Draw outer arc path
@@ -233,7 +241,6 @@
           'Z'//Cloth path
         ];
         $paths[i].attr("d", cmd.join(' '));
-        startRadius += segmentAngle;
       }
     }
     function drawDoughnutText(animationDecimal, segmentTotal) {
