@@ -1,3 +1,5 @@
+/*global jQuery*/
+/*jslint -W110, sloppy:true */
 /*!
  * jquery.drawDoughnutChart.js
  * Version: 0.4(Beta)
@@ -23,7 +25,7 @@
         segmentStrokeColor : "#0C1013",
         segmentStrokeWidth : 1,
         baseColor: "rgba(0,0,0,0.5)",
-        holeColor: "rgba(0,0,0,0)",
+        holeColor: "rgb(255, 255, 255)",
         baseOffset: 4,
         edgeOffset : 10,//offset from edge of $this
         percentageInnerCutout : 75,
@@ -44,15 +46,15 @@
         summaryNumberClass: "doughnutSummaryNumber",
         beforeDraw: function() {  },
         afterDrawed : function() {  },
-        onPathEnter : function(e,data) {  },
-        onPathLeave : function(e,data) {  }
+        onPathEnter : function(/*e,data*/) {  },
+        onPathLeave : function(/*e,data*/) {  }
       }, options),
       animationOptions = {
         linear : function (t) {
           return t;
         },
         easeInOutExpo: function (t) {
-          var v = t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t;
+          var v = t<0.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t;
           return (v>1) ? 1 : v;
         }
       },
@@ -76,14 +78,12 @@
         cutoutRadius = doughnutRadius * (settings.percentageInnerCutout / 100),
         segmentTotal = 0;
 
-
+    //Draw hole background
     var baseDoughnutRadius = doughnutRadius + settings.baseOffset,
         baseCutoutRadius = cutoutRadius - settings.baseOffset;
-
-    //Draw hole background
     $(document.createElementNS('http://www.w3.org/2000/svg', 'path'))
       .attr({
-        "d": getHollowCirclePath(cutoutRadius + 1, 0), // +1 to add a little 'underlap' to avoid patchy seam
+        "d": getHollowCirclePath(cutoutRadius + 1, 0),
         "fill": settings.holeColor
       })
       .appendTo($svg);
@@ -102,9 +102,7 @@
 
     //Set up tooltip
     if (settings.showTip) {
-      var $tip = $('<div class="' + settings.tipClass + '" />').appendTo('body').hide(),
-          tipW = $tip.width(),
-          tipH = $tip.height();
+      var $tip = $('<div class="' + settings.tipClass + '" />').appendTo('body').hide();
     }
 
     //Set up center text area
@@ -145,7 +143,7 @@
         //Calculate values for the path.
         //We needn't calculate startRadius, segmentAngle and endRadius, because base doughnut doesn't animate.
         var startRadius = -1.570,// -Math.PI/2
-            segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),
+            /*segmentAngle = 6.2831,// 1 * ((99.9999/100) * (PI*2)),*/
             endRadius = 4.7131,// startRadius + segmentAngle
             startX = centerX + cos(startRadius) * doughnutRadius,
             startY = centerY + sin(startRadius) * doughnutRadius,
@@ -165,7 +163,7 @@
         ];
         cmd = cmd.join(' ');
         return cmd;
-    };
+    }
     function pathMouseEnter(e) {
       var order = $(this).data().order;
       if (settings.showTip) {
@@ -196,7 +194,7 @@
         });
       }
     }
-	function pathClick(e){
+	function pathClick(/*e*/) {
 	var order = $(this).data().order;
 	  if (typeof data[order].action != "undefined")
 		  data[order].action();
@@ -261,9 +259,6 @@
             settings.afterDrawed.call($this);
           }
       });
-    }
-    function Max(arr) {
-      return Math.max.apply(null, arr);
     }
     function Min(arr) {
       return Math.min.apply(null, arr);
